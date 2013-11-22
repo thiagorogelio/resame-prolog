@@ -1,0 +1,55 @@
+src/prolog/run testes/grandes/com-solucao/6-7-4 Fail
+  Resolucao
+  /home/maxx/resame-prolog/testes/grandes/com-solucao/6-7-4
+  
+  Erro na formatacao da resolucao. Verifique a especificacao do trabalho.
+  Resolucao obtida
+  /home/maxx/resame-prolog/testes/grandes/com-solucao/6-7-4
+  
+  Erro encontrado: invalid literal for int() with base 10: '/home/maxx/resame-prolog/testes/grandes/com-solucao/6-7-4'
+src/prolog/run testes/grandes/com-solucao/7-6-4 Fail
+  Resolucao
+  /home/maxx/resame-prolog/testes/grandes/com-solucao/7-6-4
+  
+  Erro na formatacao da resolucao. Verifique a especificacao do trabalho.
+  Resolucao obtida
+  /home/maxx/resame-prolog/testes/grandes/com-solucao/7-6-4
+  
+  Erro encontrado: invalid literal for int() with base 10: '/home/maxx/resame-prolog/testes/grandes/com-solucao/7-6-4'
+src/prolog/run testes/grandes/com-solucao/7-7-4 Fail
+  Resolucao
+  /home/maxx/resame-prolog/testes/grandes/com-solucao/7-7-4
+  
+  Erro na formatacao da resolucao. Verifique a especificacao do trabalho.
+  Resolucao obtida
+  /home/maxx/resame-prolog/testes/grandes/com-solucao/7-7-4
+  
+  Erro encontrado: invalid literal for int() with base 10: '/home/maxx/resame-prolog/testes/grandes/com-solucao/7-7-4'
+src/prolog/run testes/grandes/sem-solucao/6-7-4 Fail
+  Resolucao
+  /home/maxx/resame-prolog/testes/grandes/sem-solucao/6-7-4
+  
+  Erro na formatacao da resolucao. Verifique a especificacao do trabalho.
+  Resolucao obtida
+  /home/maxx/resame-prolog/testes/grandes/sem-solucao/6-7-4
+  
+  Erro encontrado: invalid literal for int() with base 10: '/home/maxx/resame-prolog/testes/grandes/sem-solucao/6-7-4'
+src/prolog/run testes/grandes/sem-solucao/7-6-4 Fail
+  Resolucao
+  /home/maxx/resame-prolog/testes/grandes/sem-solucao/7-6-4
+  
+  Erro na formatacao da resolucao. Verifique a especificacao do trabalho.
+  Resolucao obtida
+  /home/maxx/resame-prolog/testes/grandes/sem-solucao/7-6-4
+  
+  Erro encontrado: invalid literal for int() with base 10: '/home/maxx/resame-prolog/testes/grandes/sem-solucao/7-6-4'
+src/prolog/run testes/grandes/sem-solucao/7-7-4 Fail
+  Resolucao
+  /home/maxx/resame-prolog/testes/grandes/sem-solucao/7-7-4
+  
+  Erro na formatacao da resolucao. Verifique a especificacao do trabalho.
+  Resolucao obtida
+  /home/maxx/resame-prolog/testes/grandes/sem-solucao/7-7-4
+  
+  Erro encontrado: invalid literal for int() with base 10: '/home/maxx/resame-prolog/testes/grandes/sem-solucao/7-7-4'
+0/6 acertos (0.31)
