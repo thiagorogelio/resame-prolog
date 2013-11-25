@@ -35,8 +35,56 @@
 %  Carrega um jogo same do arquivo File e imprime uma resolução na saída padrão
 %  ou sem-solucao se o jogo não tem solução.
 
+print_lin(_,4,_).
+
+print_lin(Same,L,C) :-
+	L1 is L+1,
+	L1 < 5,
+	elem(Same,pos(C,L),A),
+	nonvar(A),
+	write(A),
+	write(' '),
+	print_lin(Same,L1,C).
+
+print_lin(Same,L,C) :-
+	L1 is L+1,
+	L1 < 5,
+	not(elem(Same,pos(C,L),_)),
+	write('0 '),
+	print_lin(Same,L1,C).
+
+
+print_Same(Same) :-
+	print_lin(Same,0,3),
+	writeln(''),
+	print_lin(Same,0,2),
+	writeln(''),
+	print_lin(Same,0,1),
+	writeln(''),
+	print_lin(Same,0,0),
+	writeln('').
+
+printsol(_,[]).
+
+printsol(Same, [A|B]) :-
+    A = pos(X,Y),
+    write(X),
+    write(' '),
+    writeln(Y),
+    writeln(''),
+    group(Same, A, Group),
+    remove_group(Same, Group, NewSame),
+    print_Same(NewSame),
+    writeln(''),
+    printsol(NewSame,B).
+
 main(File) :-
-    writeln(File), fail.
+    read_matrix_file(File, M),
+    transpose(M,T),
+    solve(T, S),
+    write('s = \"'),
+    printsol(T,S),
+    write('\"'),!.
 
 %% solve(+Same, -Moves) is nondet
 %
@@ -60,23 +108,85 @@ solve(Same, [M|Moves]) :-
 %  auxiliares.
 
 group(Same, Group) :-
-    writeln([Same, Group]), fail.
+	gerador(Same, pos(0,0), Group).
+
+gerador(Same, P, Sorted) :-
+	group(Same, P, Group),
+	length(Group,L),
+	L > 1,
+	sort(Group, Sorted).
+
+gerador(Same, pos(X, Y), Group) :-
+	X1 is X + 1,
+	X1 < 4,
+	gerador(Same, pos(X1, Y), Group),
+	not(previous_elem(Group, pos(X1,Y))).
+
+gerador(Same, pos(0, Y), Group) :-
+	Y1 is Y + 1,
+	Y1 < 4,
+	gerador(Same, pos(0, Y1), Group),
+	not(previous_elem(Group, pos(0,Y1))).
+
+
+previous_elem([pos(_,Y)|_],pos(_,Y1)) :-
+	Y < Y1.
+
+previous_elem([pos(X,Y)|_],pos(X1,Y1)) :-
+	Y = Y1,
+	X < X1.
+
+previous_elem([_|B],C) :-
+	previous_elem(B, C).
 
 %% grupo(+Same, +P, -Group) is semidet
 %
 %  Verdadeiro se Group é um grupo de Same que contém a posição P.
 
 group(Same, P, Group) :-
-    writeln([Same, P, Group]), fail.
+    elem(Same, P, C),
+    visita(Same, C, [P], [], [], Group).
 
-%% visita(P, C, Candidatos, Visitados) is semidet
+%% visita(Same, C, Candidatos, Grupo) is semidet
 %
-% verdadeiro se P é pos(X,Y) e é da Cor C;
+%
 
-%visita(pos(X, Y), C, Candidatos, Visitados)
+% Verdadeiro se el está em uma das 2 listas.
+elem_of(El, A, B) :-
+	append(A, B, C),
+	member(El, C).
 
+remove_iguais([], _, []).
 
-%% elem(Same, P, C) is semidet
+remove_iguais([A|B], G, New) :-
+	elem_of(A,G,B),
+	remove_iguais(B, G, New).
+
+remove_iguais([A|B], G, [A|New]) :-
+	not(elem_of(A,G,B)),
+	remove_iguais(B, G, New).
+
+visita( _, _, [], Grupo, _, Grupo).
+
+visita(Same, C, [A|B], Grupo, Visit, NewGrup2) :-
+	elem(Same, A, C),
+	Visit1 = [A|Visit],
+	NewGrup = [A|Grupo],
+	A = pos(X,Y),
+	X1 is X+1,
+	X2 is X-1,
+	Y1 is Y+1,
+	Y2 is Y-1,
+	Candidatos = [pos(X1,Y),pos(X2,Y),pos(X,Y1),pos(X,Y2)|B],
+	remove_iguais(Candidatos, Visit1, NewCand),
+	visita(Same, C, NewCand, NewGrup, Visit1, NewGrup2).
+
+visita(Same, C, [A|B], Grupo, Visit, NewGrup) :-
+	not(elem(Same, A, C)),
+	Visit1 = [A|Visit],
+	visita(Same, C, B, Grupo, Visit1, NewGrup).
+
+%% elem(+Same, +P, -C) is semidet
 %
 % Verdadeiro se C é a cor do elemento P de Same
 
@@ -85,7 +195,7 @@ elem([[A|_]|_], pos(0, 0), A).
 elem([[_|R]|_], pos(B, 0), C) :-
 	B > 0,
 	B1 is B - 1,
-	elem([[R]|_], pos(B1, 0), C).
+	elem([R|_], pos(B1, 0), C).
 
 elem([_|R], pos(X, Y), C) :-
 	Y > 0,
@@ -99,5 +209,37 @@ elem([_|R], pos(X, Y), C) :-
 %  Dica:
 %    - crie um predicado auxiliar remove_column_group, que remove os elementos
 %    de uma coluna específica
-remove_group(Same, Group, NewSame) :-
-    writeln([Same, Group, NewSame]), fail.
+
+arrasta_cols([],[]).
+
+arrasta_cols([[]|B], C) :-
+	arrasta_cols(B,C).
+
+arrasta_cols([A|B],[A|C]) :-
+	length(A,L),
+	L > 0,
+	arrasta_cols(B,C).
+
+remove_group(Same, Group, NewSame2) :-
+	sort(Group,Sorted),
+	reverse(Rev,Sorted),
+	remove_group2(Same, Rev, NewSame),
+        arrasta_cols(NewSame, NewSame2).
+
+remove_group2(Same, [], Same).
+
+remove_group2(Same, [A|B], NewSame) :-
+	remove_pos(Same, A, NewSame1),
+	remove_group2(NewSame1, B, NewSame).
+
+remove_pos([[_|A]|B], pos(0,0), [A|B]).
+
+remove_pos([[A|B]|C], pos(X,0), [[A|N]|C]) :-
+	X > 0,
+	X1 is X - 1,
+	remove_pos([B|_], pos(X1,0), [N|_]).
+
+remove_pos([A|B], pos(X,Y), [A|N]) :-
+	Y > 0,
+	Y1 is Y - 1,
+	remove_pos(B, pos(X,Y1), N).
