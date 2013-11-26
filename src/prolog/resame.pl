@@ -35,53 +35,59 @@
 %  Carrega um jogo same do arquivo File e imprime uma resolução na saída padrão
 %  ou sem-solucao se o jogo não tem solução.
 
-print_lin(_,4,_).
+print_lin(_,_,A,A).
 
-print_lin(Same,L,C) :-
-	L1 is L+1,
-	L1 < 5,
-	elem(Same,pos(C,L),A),
-	nonvar(A),
-	write(A),
+print_lin(Same,L,C,A) :-
+	A < C,
+	A1 is A+1,
+	elem(Same,pos(L,A),E),
 	write(' '),
-	print_lin(Same,L1,C).
+	write(E),
+	print_lin(Same,L,C,A1).
 
-print_lin(Same,L,C) :-
-	L1 is L+1,
-	L1 < 5,
-	not(elem(Same,pos(C,L),_)),
-	write('0 '),
-	print_lin(Same,L1,C).
+print_lin(Same,L,C,A) :-
+	A < C,
+	A1 is A+1,
+	not(elem(Same,pos(L,A),_)),
+	write(' 0'),
+	print_lin(Same,L,C,A1).
 
-
-print_Same(Same) :-
-	print_lin(Same,0,3),
+print_Same(Same,L,C) :-
+	L > 0,
+	L1 is L-1,
+	print_lin(Same,L1,C,0),
 	writeln(''),
-	print_lin(Same,0,2),
-	writeln(''),
-	print_lin(Same,0,1),
-	writeln(''),
-	print_lin(Same,0,0),
-	writeln('').
+	print_Same(Same,L1,C).
 
-printsol(_,[]).
+print_Same(_,0,_).
 
-printsol(Same, [A|B]) :-
+pula([]) :- !.
+
+pula(_) :-
+    writeln('').
+
+printsol(_,[],_).
+
+printsol(Same, [A|B],tam(L,C)) :-
+    group(Same, A, Group),
+    remove_group(Same, Group, NewSame),
     A = pos(X,Y),
     write(X),
     write(' '),
     writeln(Y),
     writeln(''),
-    group(Same, A, Group),
-    remove_group(Same, Group, NewSame),
-    print_Same(NewSame),
-    printsol(NewSame,B).
+    print_Same(NewSame, L,C),
+    pula(B),
+    printsol(NewSame,B,tam(L,C)).
 
 main(File) :-
     read_matrix_file(File, M),
     transpose(M,T),
+    length(M,L),
+    head(M,H),
+    length(H,C),
     solve(T, S),
-    printsol(T,S), !.
+    printsol(T,S,tam(L,C)), !.
 
 %% solve(+Same, -Moves) is nondet
 %
@@ -148,10 +154,15 @@ group(Same, P, Group) :-
 %
 %
 
-% Verdadeiro se el está em uma das 2 listas.
+% elem_of(El, A, B)
+%
+% Verdadeiro se el está em A ou B.
+%
 elem_of(El, A, B) :-
 	append(A, B, C),
 	member(El, C).
+
+% função de remoção de elementos que já foram visitados.
 
 remove_iguais([], _, []).
 
@@ -162,6 +173,11 @@ remove_iguais([A|B], G, New) :-
 remove_iguais([A|B], G, [A|New]) :-
 	not(elem_of(A,G,B)),
 	remove_iguais(B, G, New).
+
+%%	 visita(Same, C, Candidatos, Visitados, Grupo)
+%
+%	verdadeiro se Grupo é o grupo formado a partir de visitas em uma
+%	posição inicial.
 
 visita( _, _, [], Grupo, _, Grupo).
 
@@ -207,6 +223,13 @@ elem([_|R], pos(X, Y), C) :-
 %    - crie um predicado auxiliar remove_column_group, que remove os elementos
 %    de uma coluna específica
 
+remove_group(Same, Group, NewSame2) :-
+	sort(Group,Sorted),
+	reverse(Rev,Sorted),
+	remove_group2(Same, Rev, NewSame),
+        arrasta_cols(NewSame, NewSame2).
+
+% função para retirar colunas com tamanho 0 de Same
 arrasta_cols([],[]).
 
 arrasta_cols([[]|B], C) :-
@@ -216,12 +239,6 @@ arrasta_cols([A|B],[A|C]) :-
 	length(A,L),
 	L > 0,
 	arrasta_cols(B,C).
-
-remove_group(Same, Group, NewSame2) :-
-	sort(Group,Sorted),
-	reverse(Rev,Sorted),
-	remove_group2(Same, Rev, NewSame),
-        arrasta_cols(NewSame, NewSame2).
 
 remove_group2(Same, [], Same).
 

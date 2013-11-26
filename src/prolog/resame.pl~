@@ -35,56 +35,59 @@
 %  Carrega um jogo same do arquivo File e imprime uma resolução na saída padrão
 %  ou sem-solucao se o jogo não tem solução.
 
-print_lin(_,4,_).
+print_lin(_,_,A,A).
 
-print_lin(Same,L,C) :-
-	L1 is L+1,
-	L1 < 5,
-	elem(Same,pos(C,L),A),
-	nonvar(A),
-	write(A),
+print_lin(Same,L,C,A) :-
+	A < C,
+	A1 is A+1,
+	elem(Same,pos(L,A),E),
 	write(' '),
-	print_lin(Same,L1,C).
+	write(E),
+	print_lin(Same,L,C,A1).
 
-print_lin(Same,L,C) :-
-	L1 is L+1,
-	L1 < 5,
-	not(elem(Same,pos(C,L),_)),
-	write('0 '),
-	print_lin(Same,L1,C).
+print_lin(Same,L,C,A) :-
+	A < C,
+	A1 is A+1,
+	not(elem(Same,pos(L,A),_)),
+	write(' 0'),
+	print_lin(Same,L,C,A1).
 
-
-print_Same(Same) :-
-	print_lin(Same,0,3),
+print_Same(Same,L,C) :-
+	L > 0,
+	L1 is L-1,
+	print_lin(Same,L1,C,0),
 	writeln(''),
-	print_lin(Same,0,2),
-	writeln(''),
-	print_lin(Same,0,1),
-	writeln(''),
-	print_lin(Same,0,0),
-	writeln('').
+	print_Same(Same,L1,C).
 
-printsol(_,[]).
+print_Same(_,0,_).
 
-printsol(Same, [A|B]) :-
+pula([]) :- !.
+
+pula(_) :-
+    writeln('').
+
+printsol(_,[],_).
+
+printsol(Same, [A|B],tam(L,C)) :-
+    group(Same, A, Group),
+    remove_group(Same, Group, NewSame),
     A = pos(X,Y),
     write(X),
     write(' '),
     writeln(Y),
     writeln(''),
-    group(Same, A, Group),
-    remove_group(Same, Group, NewSame),
-    print_Same(NewSame),
-    writeln(''),
-    printsol(NewSame,B).
+    print_Same(NewSame, L,C),
+    pula(B),
+    printsol(NewSame,B,tam(L,C)).
 
 main(File) :-
     read_matrix_file(File, M),
     transpose(M,T),
+    length(M,L),
+    head(M,H),
+    length(H,C),
     solve(T, S),
-    write('s = \"'),
-    printsol(T,S),
-    write('\"'),!.
+    printsol(T,S,tam(L,C)), !.
 
 %% solve(+Same, -Moves) is nondet
 %
